@@ -1,1 +1,34 @@
-# .github-workflows
+# This is a basic workflow to help you get started with Actions
+
+name: Get RSS
+
+# Controls when the workflow will run
+on:
+  schedule:
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.8]
+
+    env:
+      NOTION_SEC: ${{ secrets.NOTION_SEC}}
+      FEISHU_BOT_API: ${{ secrets.FEISHU_BOT_API }}
+      FEISHU_BOT_SEC: ${{ secrets.FEISHU_BOT_SEC }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      - name: Load RSS feeds
+        run: |
+          python feed2notion.py
